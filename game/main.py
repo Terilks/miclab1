@@ -4,7 +4,18 @@ import pygame
 
 pygame.init()
 
-GRID_SIZE_X = 13
+tile_map = [
+    ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+    ['', '0', '0', '', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', ''],
+    ['', '0', '0', '0', '0', '', '', '', '', '', '', '', '0', '0', ''],
+    ['', '0', '0', '0', '', '', '', '0', '0', '0', '0', '0', '0', '0', ''],
+    ['', 'P', '0', '0', '', '0', '0', '0', '0', '0', '0', '0', '0', '0', ''],
+    ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+]
+
+GRID_SIZE_X = 15
 GRID_SIZE_Y = 7
 
 TILE_SIZE = 64
@@ -16,6 +27,8 @@ FPS = 60
 
 SPRITES_DIR = os.path.join(os.path.dirname(__file__), "sprites")
 WATER_FILE = os.path.join(SPRITES_DIR, "water_sprite.png")
+GRASS_FILE = os.path.join(SPRITES_DIR, "grass.png")
+CHARACTER_FILE = os.path.join(SPRITES_DIR, "character1.png")
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Labadabadapdap 1")
@@ -32,18 +45,66 @@ def load_image(path):
     except Exception:
         return pygame.transform.scale(img.convert(), (TILE_SIZE, TILE_SIZE))
 
-water_surf = load_image(WATER_FILE)
 
-TILE_WATER = "water"
+water_surf = load_image(WATER_FILE)
+grass_surf = load_image(GRASS_FILE)
+character_surf = load_image(CHARACTER_FILE)
+
+background = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+for y in range(0, HEIGHT, TILE_SIZE):
+    for x in range(0, WIDTH, TILE_SIZE):
+        background.blit(water_surf, (x, y))
+
+player_x = player_y = None
+for y, row in enumerate(tile_map):
+    for x, cell in enumerate(row):
+        if cell == 'P':
+            player_x, player_y = x, y
+            tile_map[y][x] = '0'
+            break
+    if player_x is not None:
+        break
 
 running = True
+
 while running:
     dt = clock.tick(FPS)
+    now = pygame.time.get_ticks()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    screen.blit(water_surf, (7 * TILE_SIZE, 3 * TILE_SIZE))
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+
+            dx = dy = 0
+            if event.key == pygame.K_w or event.key == pygame.K_UP:
+                dy = -1
+            elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                dy = 1
+            elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                dx = -1
+            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                dx = 1
+
+            if dx != 0 or dy != 0:
+                new_x = player_x + dx
+                new_y = player_y + dy
+
+                if 0 <= new_x < GRID_SIZE_X and 0 <= new_y < GRID_SIZE_Y:
+                    if tile_map[new_y][new_x] == '0':
+                        player_x, player_y = new_x, new_y
+
+    screen.blit(background, (0, 0))
+
+    for y, row in enumerate(tile_map):
+        for x, cell in enumerate(row):
+            if cell == '0':
+                screen.blit(grass_surf, (x * TILE_SIZE, y * TILE_SIZE))
+
+    screen.blit(character_surf, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
     pygame.display.flip()
 
