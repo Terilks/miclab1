@@ -9,7 +9,7 @@ tile_map = [
     ['', '0', '0', '', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', ''],
     ['', '0', '0', '0', '0', '', '', '', '', '', '', '', '0', '0', ''],
     ['', '0', '0', '0', '', '', '', '0', '0', '0', '0', '0', '0', 'C', ''],
-    ['', 'P', '0', '0', '', '0', '0', '0', '0', '0', '0', '0', '0', '0', ''],
+    ['', 'P', '0', '0', '', 'E', '0', '0', '0', '0', '0', '0', '0', '0', ''],
     ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
     ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
     ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
@@ -30,6 +30,7 @@ WATER_FILE = os.path.join(SPRITES_DIR, "water_sprite.png")
 GRASS_FILE = os.path.join(SPRITES_DIR, "grass.png")
 CHARACTER_FILE = os.path.join(SPRITES_DIR, "character1.png")
 STAR_FILE = os.path.join(SPRITES_DIR, "star.png")
+DOOR_FILE = os.path.join(SPRITES_DIR, "door.png")
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Labadabadapdap 1")
@@ -51,6 +52,7 @@ water_surf = load_image(WATER_FILE)
 grass_surf = load_image(GRASS_FILE)
 character_surf = load_image(CHARACTER_FILE)
 star_surf = load_image(STAR_FILE)
+door_surf = load_image(DOOR_FILE)
 
 background = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 for y in range(0, HEIGHT, TILE_SIZE):
@@ -100,12 +102,15 @@ while running:
 
                 if 0 <= new_x < GRID_SIZE_X and 0 <= new_y < GRID_SIZE_Y:
                     target = tile_map[new_y][new_x]
-                    if target == '0' or target == 'C':
+                    if target == '0':
                         player_x, player_y = new_x, new_y
-
-                        if target == 'C':
-                            score += 1
-                            tile_map[new_y][new_x] = '0'
+                    if target == 'C':
+                        player_x, player_y = new_x, new_y
+                        score += 1
+                        tile_map[new_y][new_x] = '0'
+                    if target == 'E' and score > 0:
+                        player_x, player_y = new_x, new_y
+                        running = False
 
     screen.blit(background, (0, 0))
 
@@ -116,6 +121,9 @@ while running:
             elif cell == 'C':
                 screen.blit(grass_surf, (x * TILE_SIZE, y * TILE_SIZE))
                 screen.blit(star_surf, (x * TILE_SIZE, y * TILE_SIZE))
+            elif cell == 'E':
+                screen.blit(grass_surf, (x * TILE_SIZE, y * TILE_SIZE))
+                screen.blit(door_surf, (x * TILE_SIZE, y * TILE_SIZE))
 
     screen.blit(character_surf, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
