@@ -8,7 +8,7 @@ tile_map = [
     ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
     ['', '0', '0', '', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', ''],
     ['', '0', '0', '0', '0', '', '', '', '', '', '', '', '0', '0', ''],
-    ['', '0', '0', '0', '', '', '', '0', '0', '0', '0', '0', '0', '0', ''],
+    ['', '0', '0', '0', '', '', '', '0', '0', '0', '0', '0', '0', 'C', ''],
     ['', 'P', '0', '0', '', '0', '0', '0', '0', '0', '0', '0', '0', '0', ''],
     ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
     ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
@@ -29,6 +29,7 @@ SPRITES_DIR = os.path.join(os.path.dirname(__file__), "sprites")
 WATER_FILE = os.path.join(SPRITES_DIR, "water_sprite.png")
 GRASS_FILE = os.path.join(SPRITES_DIR, "grass.png")
 CHARACTER_FILE = os.path.join(SPRITES_DIR, "character1.png")
+STAR_FILE = os.path.join(SPRITES_DIR, "star.png")
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Labadabadapdap 1")
@@ -49,6 +50,7 @@ def load_image(path):
 water_surf = load_image(WATER_FILE)
 grass_surf = load_image(GRASS_FILE)
 character_surf = load_image(CHARACTER_FILE)
+star_surf = load_image(STAR_FILE)
 
 background = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 for y in range(0, HEIGHT, TILE_SIZE):
@@ -66,6 +68,9 @@ for y, row in enumerate(tile_map):
         break
 
 running = True
+
+score = 0
+font = pygame.font.SysFont(None, 24)
 
 while running:
     dt = clock.tick(FPS)
@@ -94,8 +99,13 @@ while running:
                 new_y = player_y + dy
 
                 if 0 <= new_x < GRID_SIZE_X and 0 <= new_y < GRID_SIZE_Y:
-                    if tile_map[new_y][new_x] == '0':
+                    target = tile_map[new_y][new_x]
+                    if target == '0' or target == 'C':
                         player_x, player_y = new_x, new_y
+
+                        if target == 'C':
+                            score += 1
+                            tile_map[new_y][new_x] = '0'
 
     screen.blit(background, (0, 0))
 
@@ -103,8 +113,14 @@ while running:
         for x, cell in enumerate(row):
             if cell == '0':
                 screen.blit(grass_surf, (x * TILE_SIZE, y * TILE_SIZE))
+            elif cell == 'C':
+                screen.blit(grass_surf, (x * TILE_SIZE, y * TILE_SIZE))
+                screen.blit(star_surf, (x * TILE_SIZE, y * TILE_SIZE))
 
     screen.blit(character_surf, (player_x * TILE_SIZE, player_y * TILE_SIZE))
+
+    score_surf = font.render(f"Звезд: {score}", True, (0, 0, 0))
+    screen.blit(score_surf, (8, 8))
 
     pygame.display.flip()
 
