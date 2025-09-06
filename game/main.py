@@ -137,7 +137,7 @@ while running:
     screen.blit(score_surf, (8, 8))
 
     moves_surf = font.render(f"Moves: {moves}", True, (0, 0, 0))
-    screen.blit(moves_surf, (8, 200))
+    screen.blit(moves_surf, (8, 410))
 
     pygame.display.flip()
 
