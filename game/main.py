@@ -72,6 +72,8 @@ for y, row in enumerate(tile_map):
 running = True
 
 score = 0
+moves = 0
+
 font = pygame.font.SysFont(None, 24)
 
 while running:
@@ -104,13 +106,17 @@ while running:
                     target = tile_map[new_y][new_x]
                     if target == '0':
                         player_x, player_y = new_x, new_y
+                        moves += 1
                     if target == 'C':
                         player_x, player_y = new_x, new_y
                         score += 1
                         tile_map[new_y][new_x] = '0'
+                        moves += 1
                     if target == 'E' and score > 0:
                         player_x, player_y = new_x, new_y
+                        moves += 1
                         running = False
+
 
     screen.blit(background, (0, 0))
 
@@ -129,6 +135,9 @@ while running:
 
     score_surf = font.render(f"Звезд: {score}", True, (0, 0, 0))
     screen.blit(score_surf, (8, 8))
+
+    moves_surf = font.render(f"Moves: {moves}", True, (0, 0, 0))
+    screen.blit(moves_surf, (8, 200))
 
     pygame.display.flip()
 
