@@ -36,6 +36,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Labadabadapdap 1")
 clock = pygame.time.Clock()
 
+
 def load_image(path):
     try:
         img = pygame.image.load(path)
@@ -43,7 +44,9 @@ def load_image(path):
         raise SystemExit(f"Не удалось загрузить изображение {path}: {e}")
     # если есть альфа — используем convert_alpha, иначе convert
     try:
-        return pygame.transform.scale(img.convert_alpha(), (TILE_SIZE, TILE_SIZE))
+        return pygame.transform.scale(
+            img.convert_alpha(),
+            (TILE_SIZE, TILE_SIZE))
     except Exception:
         return pygame.transform.scale(img.convert(), (TILE_SIZE, TILE_SIZE))
 
@@ -116,7 +119,6 @@ while running:
                         player_x, player_y = new_x, new_y
                         moves += 1
                         running = False
-
 
     screen.blit(background, (0, 0))
 
