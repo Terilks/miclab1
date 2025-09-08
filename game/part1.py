@@ -4,19 +4,48 @@ import pygame
 
 pygame.init()
 
-tile_map = [
-    ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-    ['', '0', '0', '', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', ''],
-    ['', '0', '0', '0', '0', '', '', '', '', '', '', '', '0', '0', ''],
-    ['', '0', '0', '0', '', '', '', '0', '0', '0', '0', '0', '0', 'C', ''],
-    ['', 'P', '0', '0', '', 'E', '0', '0', '0', '0', '0', '0', '0', '0', ''],
-    ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-    ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-]
+ALLOWED = {'0', '1', 'C', 'E', 'P'}
 
-GRID_SIZE_X = 15
-GRID_SIZE_Y = 7
+
+def load_map_txt(path):
+    if not os.path.isabs(path):
+        path = os.path.join(os.path.dirname(__file__), path)
+
+    rows = []
+    with open(path, 'r', encoding='utf-8') as f:
+        for line in f:
+            s = line.strip()
+            if not s or s.startswith('#'):
+                continue
+            rows.append(list(s))
+
+    w = len(rows[0])
+    if any(len(r) != w for r in rows):
+        raise SystemExit("Строки карты разной длины.")
+
+    for y, r in enumerate(rows):
+        for x, c in enumerate(r):
+            if c not in ALLOWED:
+                raise SystemExit(f"Недопустимый символ '{c}' в ({y},{x}).")
+
+    p = sum(c == 'P' for r in rows for c in r)
+    c = sum(c == 'C' for r in rows for c in r)
+    e = sum(c == 'E' for r in rows for c in r)
+
+    if p != 1:
+        raise SystemExit("На карте должен быть ровно один P.")
+    if c < 1:
+        raise SystemExit("Должен быть хотя бы один C.")
+    if e < 1:
+        raise SystemExit("Должен быть хотя бы один E.")
+
+    return rows
+
+
+tile_map = load_map_txt("tile_map.txt")
+
+GRID_SIZE_X = len(tile_map[0])
+GRID_SIZE_Y = len(tile_map)
 
 TILE_SIZE = 64
 
@@ -56,11 +85,6 @@ grass_surf = load_image(GRASS_FILE)
 character_surf = load_image(CHARACTER_FILE)
 star_surf = load_image(STAR_FILE)
 door_surf = load_image(DOOR_FILE)
-
-background = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-for y in range(0, HEIGHT, TILE_SIZE):
-    for x in range(0, WIDTH, TILE_SIZE):
-        background.blit(water_surf, (x, y))
 
 player_x = player_y = None
 for y, row in enumerate(tile_map):
@@ -120,11 +144,11 @@ while running:
                         moves += 1
                         running = False
 
-    screen.blit(background, (0, 0))
-
     for y, row in enumerate(tile_map):
         for x, cell in enumerate(row):
-            if cell == '0':
+            if cell == '1':
+                screen.blit(water_surf, (x * TILE_SIZE, y * TILE_SIZE))
+            elif cell == '0':
                 screen.blit(grass_surf, (x * TILE_SIZE, y * TILE_SIZE))
             elif cell == 'C':
                 screen.blit(grass_surf, (x * TILE_SIZE, y * TILE_SIZE))
