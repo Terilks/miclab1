@@ -86,6 +86,25 @@ character_surf = load_image(CHARACTER_FILE)
 star_surf = load_image(STAR_FILE)
 door_surf = load_image(DOOR_FILE)
 
+BASE_DIR = 'right'
+
+def make_lr(img, base_dir='right'):
+    if base_dir == 'right':
+        right = img
+    elif base_dir == 'left':
+        right = pygame.transform.flip(img, True, False)
+    elif base_dir == 'up':
+        right = pygame.transform.rotate(img, -90)
+    elif base_dir == 'down':
+        right = pygame.transform.rotate(img, 90)
+    else:
+        right = img
+    left = pygame.transform.flip(right, True, False)
+    return left, right
+
+char_left, char_right = make_lr(character_surf, BASE_DIR)
+facing_right = True
+
 player_x = player_y = None
 for y, row in enumerate(tile_map):
     for x, cell in enumerate(row):
@@ -144,6 +163,11 @@ while running:
                         moves += 1
                         running = False
 
+                if dx == 1:
+                    facing_right = True
+                elif dx == -1:
+                    facing_right = False
+
     for y, row in enumerate(tile_map):
         for x, cell in enumerate(row):
             if cell == '1':
@@ -157,7 +181,8 @@ while running:
                 screen.blit(grass_surf, (x * TILE_SIZE, y * TILE_SIZE))
                 screen.blit(door_surf, (x * TILE_SIZE, y * TILE_SIZE))
 
-    screen.blit(character_surf, (player_x * TILE_SIZE, player_y * TILE_SIZE))
+    screen.blit(char_right if facing_right else char_left,
+                (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
     score_surf = font.render(f"Звезд: {score}", True, (0, 0, 0))
     screen.blit(score_surf, (8, 8))
