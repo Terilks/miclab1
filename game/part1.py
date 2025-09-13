@@ -88,6 +88,7 @@ door_surf = load_image(DOOR_FILE)
 
 BASE_DIR = 'right'
 
+
 def make_lr(img, base_dir='right'):
     if base_dir == 'right':
         right = img
@@ -101,6 +102,7 @@ def make_lr(img, base_dir='right'):
         right = img
     left = pygame.transform.flip(right, True, False)
     return left, right
+
 
 char_left, char_right = make_lr(character_surf, BASE_DIR)
 facing_right = True
