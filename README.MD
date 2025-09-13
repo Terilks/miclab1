@@ -34,12 +34,6 @@ pip install --upgrade pip
 pip install pygame
 ```
 
-> Если хотите — добавьте файл `requirements.txt` со строкой:
->
-> ```
-> pygame>=2.5
-> ```
-
 ---
 
 ## ▶️ Запуск
